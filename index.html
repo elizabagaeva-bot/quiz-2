@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Почему ты живёшь не свою жизнь? — Элиза Купеева</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --milk:     #FAF7F2;
+    --beige:    #F0EAE0;
+    --beige2:   #E8DFD1;
+    --terra:    #B5674B;
+    --terra-lt: #C8806A;
+    --gold:     #C4A96D;
+    --gold-lt:  #D4BC88;
+    --ink:      #2C2420;
+    --ink-lt:   #6B5B52;
+    --white:    #FFFFFF;
+    --shadow:   rgba(44,36,32,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--milk);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  /* ── Декоративный фон ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 10%, rgba(196,169,109,.13) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 90% 90%, rgba(181,103,75,.10) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Контейнер ── */
+  .quiz-wrap {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px;
+  }
+
+  /* ── Экран ── */
+  .screen {
+    display: none;
+    animation: fadeUp .45s cubic-bezier(.22,1,.36,1) both;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Карточка ── */
+  .card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 48px 44px;
+    box-shadow: 0 8px 40px var(--shadow);
+  }
+
+  @media (max-width: 520px) {
+    .card { padding: 36px 24px; border-radius: 20px; }
+  }
+
+  /* ── Логотип / подпись автора ── */
+  .author {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  /* ── Прогресс ── */
+  .progress-wrap {
+    margin-bottom: 28px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-lt);
+  }
+  .progress-count {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: .05em;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--beige2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--terra-lt));
+    border-radius: 2px;
+    transition: width .5s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ── Заголовки ── */
+  .display {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 5vw, 38px);
+    font-weight: 300;
+    line-height: 1.22;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .display em { font-style: italic; color: var(--terra); }
+
+  .subtitle {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--ink-lt);
+    margin-bottom: 36px;
+  }
+
+  .question-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 3.5vw, 26px);
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  /* ── Варианты ответа ── */
+  .options { display: flex; flex-direction: column; gap: 12px; }
+
+  .option {
+    position: relative;
+    padding: 16px 20px 16px 48px;
+    border: 1.5px solid var(--beige2);
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--milk);
+    transition: border-color .2s, background .2s, transform .15s;
+    user-select: none;
+  }
+  .option::before {
+    content: '';
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--beige2);
+    background: var(--white);
+    transition: border-color .2s, background .2s;
+    flex-shrink: 0;
+  }
+  .option:hover {
+    border-color: var(--gold-lt);
+    background: var(--beige);
+    transform: translateY(-1px);
+  }
+  .option.selected {
+    border-color: var(--terra);
+    background: rgba(181,103,75,.07);
+  }
+  .option.selected::before {
+    background: var(--terra);
+    border-color: var(--terra);
+    box-shadow: inset 0 0 0 3px var(--white);
+  }
+
+  /* ── Кнопки ── */
+  .btn {
+    display: inline-block;
+    padding: 16px 40px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    transition: transform .18s, box-shadow .18s, background .2s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--terra), #A0543A);
+    color: var(--white);
+    box-shadow: 0 4px 20px rgba(181,103,75,.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(181,103,75,.40);
+  }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), #B09358);
+    color: var(--white);
+    box-shadow: 0 4px 20px rgba(196,169,109,.35);
+  }
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(196,169,109,.40);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--terra);
+    color: var(--terra);
+  }
+  .btn-outline:hover { background: rgba(181,103,75,.06); }
+
+  .btn-center { text-align: center; margin-top: 36px; }
+
+  /* ── Стартовый экран ── */
+  .start-ornament {
+    width: 56px; height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--terra-lt));
+    border-radius: 1px;
+    margin: 0 auto 32px;
+  }
+
+  /* ── Форма контактов ── */
+  .field-group { display: flex; flex-direction: column; gap: 16px; margin-bottom: 8px; }
+  .field-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--ink-lt);
+    margin-bottom: 6px;
+  }
+  .field-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1.5px solid var(--beige2);
+    border-radius: 12px;
+    background: var(--milk);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .field-input:focus { border-color: var(--gold); }
+  .field-input::placeholder { color: var(--ink-lt); opacity: .6; }
+  .field-hint {
+    font-size: 12px;
+    color: var(--ink-lt);
+    margin-top: 12px;
+    line-height: 1.55;
+    opacity: .75;
+  }
+
+  /* ── Результат ── */
+  .result-type {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-lt);
+    border-radius: 100px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+  }
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 4vw, 34px);
+    font-weight: 300;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+  .result-body {
+    font-size: 15px;
+    line-height: 1.72;
+    color: var(--ink-lt);
+    margin-bottom: 24px;
+  }
+  .result-body p + p { margin-top: 14px; }
+
+  .offer-card {
+    background: linear-gradient(135deg, rgba(181,103,75,.09), rgba(196,169,109,.09));
+    border: 1px solid rgba(196,169,109,.3);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-top: 28px;
+  }
+  .offer-label {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: 8px;
+  }
+  .offer-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .offer-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink-lt);
+    margin-bottom: 20px;
+  }
+  .offer-price {
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  /* ── Разделитель ── */
+  .divider {
+    height: 1px;
+    background: var(--beige2);
+    margin: 28px 0;
+  }
+
+  /* ── Подпись в результате ── */
+  .eliza-sign {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .eliza-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-lt), var(--terra-lt));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .eliza-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .eliza-role { font-size: 12px; color: var(--ink-lt); margin-top: 2px; }
+
+  /* ── Error ── */
+  .error-msg {
+    font-size: 12px;
+    color: var(--terra);
+    margin-top: 8px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+</style>
+</head>
+<body>
+<div class="quiz-wrap">
+
+  <!-- ════════════ СТАРТ ════════════ -->
+  <div class="screen active" id="screen-start">
+    <div class="card">
+      <p class="author">Элиза Купеева · Астролог</p>
+      <div class="start-ornament"></div>
+      <h1 class="display">Почему ты живёшь<br><em>не свою жизнь?</em></h1>
+      <p class="subtitle">Ответь на 8 вопросов и узнай, что именно мешает тебе слышать себя и двигаться по своему пути.</p>
+      <p class="subtitle" style="margin-bottom:0; font-size:13px;">Без эзотерики. Без предсказаний.<br>Только честный взгляд на то, что происходит.</p>
+      <div class="btn-center">
+        <button class="btn btn-primary" onclick="startQuiz()">Начать →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ ВОПРОСЫ ════════════ -->
+  <div class="screen" id="screen-questions">
+    <div class="card">
+      <p class="author">Элиза Купеева · Астролог</p>
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span class="progress-label">Вопрос</span>
+          <span class="progress-count" id="progress-count">1 из 8</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:12.5%"></div></div>
+      </div>
+      <p class="question-text" id="question-text"></p>
+      <div class="options" id="options-list"></div>
+    </div>
+  </div>
+
+  <!-- ════════════ КОНТАКТЫ ════════════ -->
+  <div class="screen" id="screen-contact">
+    <div class="card">
+      <p class="author">Элиза Купеева · Астролог</p>
+      <div class="start-ornament"></div>
+      <h2 class="display" style="font-size:clamp(22px,4vw,30px);">Твой результат готов</h2>
+      <p class="subtitle">Введи имя и Telegram — я пришлю его туда. Так ты точно не потеряешь, и я смогу написать тебе лично, если увижу что-то важное в твоём типе.</p>
+      <div class="field-group">
+        <div>
+          <label class="field-label" for="inp-name">Твоё имя</label>
+          <input class="field-input" id="inp-name" type="text" placeholder="Например, Анна" autocomplete="given-name">
+        </div>
+        <div>
+          <label class="field-label" for="inp-tg">Telegram</label>
+          <input class="field-input" id="inp-tg" type="text" placeholder="@username" autocomplete="off">
+        </div>
+      </div>
+      <p class="field-hint">Никаких рассылок без твоего согласия. Только результат и один личный комментарий от меня.</p>
+      <p class="error-msg" id="contact-error">Пожалуйста, заполни оба поля</p>
+      <div class="btn-center">
+        <button class="btn btn-primary" onclick="submitContact()">Показать результат →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ РЕЗУЛЬТАТ ════════════ -->
+  <div class="screen" id="screen-result">
+    <div class="card">
+      <p class="author">Элиза Купеева · Астролог</p>
+      <div class="result-type" id="result-type"></div>
+      <h2 class="result-title" id="result-title"></h2>
+      <div class="result-body" id="result-body"></div>
+      <div class="divider"></div>
+      <div class="offer-card">
+        <p class="offer-label">Следующий шаг</p>
+        <p class="offer-title">Разбор одного вопроса по твоей карте</p>
+        <p class="offer-desc">Напиши один вопрос о себе — и я отвечу текстом в течение 48 часов. Конкретно, без воды, с опорой на твою натальную карту.</p>
+        <p class="offer-price">990 ₽ · текстовый формат · ответ за 48 часов</p>
+        <a class="btn btn-gold" href="https://t.me/ElizaKupeeva" target="_blank" rel="noopener">Задать вопрос →</a>
+      </div>
+      <div class="divider"></div>
+      <div class="eliza-sign">
+        <div class="eliza-avatar">Э</div>
+        <div>
+          <div class="eliza-name">Элиза Купеева</div>
+          <div class="eliza-role">Астролог · Метод легализации правды</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /quiz-wrap -->
+
+<script>
+// ════════ ДАННЫЕ ════════
+const questions = [
+  {
+    text: "Когда тебя спрашивают «чего ты хочешь?» — что происходит внутри?",
+    options: [
+      { text: "Я знаю, но говорить об этом как-то неловко", type: "A" },
+      { text: "Честно — не знаю. Пустота или туман", type: "B" },
+      { text: "Хочу многого, но всё кажется недостижимым или «не для меня»", type: "C" },
+      { text: "Хочу одно, а делаю совсем другое — и сама не понимаю почему", type: "D" }
+    ]
+  },
+  {
+    text: "Как ты обычно принимаешь важные решения?",
+    options: [
+      { text: "Долго советуюсь, взвешиваю — и всё равно сомневаюсь", type: "A" },
+      { text: "Откладываю. Само как-нибудь решится", type: "B" },
+      { text: "Решаю быстро, но потом грызу себя: а вдруг не так", type: "C" },
+      { text: "Ориентируюсь на то, что «правильно» или «надо» — своё где-то теряется", type: "D" }
+    ]
+  },
+  {
+    text: "Если честно — чью жизнь ты сейчас живёшь?",
+    options: [
+      { text: "Скорее ту, которую от меня ожидают", type: "A" },
+      { text: "Вообще не понимаю, какой она должна быть — моя жизнь", type: "B" },
+      { text: "Свою, но с постоянным ощущением, что что-то не то", type: "C" },
+      { text: "Начала строить свою, но страшно — и снова возвращаюсь к привычному", type: "D" }
+    ]
+  },
+  {
+    text: "Что тебя останавливает чаще всего?",
+    options: [
+      { text: "Мнение других — что скажут, как воспримут", type: "A" },
+      { text: "Ощущение, что я не знаю, кто я вообще такая", type: "B" },
+      { text: "Страх ошибиться или потерять то, что уже есть", type: "C" },
+      { text: "Усталость. Хочется, но сил нет даже начать", type: "D" }
+    ]
+  },
+  {
+    text: "Как выглядит твоё утро в последнее время?",
+    options: [
+      { text: "Встаю — и сразу думаю о том, что должна сделать для других", type: "A" },
+      { text: "Просыпаюсь без ощущения смысла. День начинается как обязанность", type: "B" },
+      { text: "Тревога раньше, чем мысли. Уже с утра что-то давит", type: "C" },
+      { text: "Нормально — но к вечеру снова чувствую, что живу не своим", type: "D" }
+    ]
+  },
+  {
+    text: "Когда ты в последний раз делала что-то только для себя — без пользы, без цели, просто потому что хотела?",
+    options: [
+      { text: "Давно. Всегда есть кто-то важнее", type: "A" },
+      { text: "Не помню. Я вообще не очень понимаю, что мне нравится", type: "B" },
+      { text: "Пробовала — но чувствую себя виноватой", type: "C" },
+      { text: "Иногда делаю, но потом сама же обесцениваю", type: "D" }
+    ]
+  },
+  {
+    text: "Что ближе всего к тому, что ты чувствуешь прямо сейчас?",
+    options: [
+      { text: "Я устала жить для всех, кроме себя", type: "A" },
+      { text: "Я потерялась. Не знаю, кто я без своих ролей", type: "B" },
+      { text: "Я знаю, чего хочу — но не верю, что это возможно", type: "C" },
+      { text: "Я на перепутье. Хочу изменений, но не знаю, куда идти", type: "D" }
+    ]
+  },
+  {
+    text: "Если бы ты могла дать себе одно разрешение прямо сейчас — что бы это было?",
+    options: [
+      { text: "Разрешение думать о себе без чувства вины", type: "A" },
+      { text: "Разрешение не знать — и всё равно двигаться", type: "B" },
+      { text: "Разрешение ошибиться и не потерять себя от этого", type: "C" },
+      { text: "Разрешение выбрать своё — даже если это не совпадает с ожиданиями других", type: "D" }
+    ]
+  }
+];
+
+const results = {
+  A: {
+    type: "Твой тип",
+    title: "Ты живёшь для других",
+    body: `<p>Ты давно поставила себя на последнее место. Не потому что слабая — а потому что где-то решила, что так правильно. Что сначала все, потом ты. Проблема в том, что «потом» не наступает.</p>
+    <p>В натальной карте это хорошо видно через положение Солнца: когда человек не опирается на свой центр, он неосознанно живёт из чужих ожиданий. Не из злого умысла — просто так сложилось. И это можно распутать.</p>
+    <p>Первый шаг — понять, где в твоей карте находится твоя настоящая точка опоры. Не та, которую ты придумала. А та, которая твоя.</p>`
+  },
+  B: {
+    type: "Твой тип",
+    title: "Ты потеряла себя",
+    body: `<p>Ты не знаешь, чего хочешь — и это не каприз и не лень. Это значит, что в какой-то момент ты так долго подстраивалась, что перестала слышать себя. Это происходит постепенно, почти незаметно.</p>
+    <p>В астрологии это читается через Солнце: когда человек не живёт из своего Солнца, он теряет ощущение себя. Остаются роли, обязанности, привычки — но не жизнь.</p>
+    <p>Хорошая новость: это не навсегда. Себя можно найти снова. Просто нужно знать, куда смотреть.</p>`
+  },
+  C: {
+    type: "Твой тип",
+    title: "Ты знаешь ответ, но не доверяешь себе",
+    body: `<p>Ты не потерялась. Ты знаешь, чего хочешь — но каждый раз находишь причину не двигаться. Страх ошибиться. Страх, что не получится. Страх, что не заслуживаешь.</p>
+    <p>В натальной карте это часто видно через напряжённые аспекты Солнца или Сатурна: человек умный, чувствующий — но сам себе ставит блоки. Иногда это родительские установки. Иногда — собственные.</p>
+    <p>Ты давно знаешь ответ. Просто не доверяешь себе достаточно, чтобы на него опереться.</p>`
+  },
+  D: {
+    type: "Твой тип",
+    title: "Ты на перепутье",
+    body: `<p>Ты чувствуешь, что что-то должно измениться. Старое уже не подходит, новое ещё не сложилось. Это не кризис — это точка выбора. Только непонятно, в какую сторону идти.</p>
+    <p>В астрологии такие периоды часто совпадают с транзитами Сатурна или Урана — когда карта буквально «требует» пересмотра направления. Это не случайно.</p>
+    <p>Вопрос не в том, менять или не менять. Вопрос — куда именно и как не потерять себя в процессе.</p>`
+  }
+};
+
+// ════════ СОСТОЯНИЕ ════════
+let currentQ   = 0;
+let scores     = { A: 0, B: 0, C: 0, D: 0 };
+let lastAnswer = null;
+let resultType = null;
+
+// ════════ НАВИГАЦИЯ ════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  currentQ = 0;
+  scores = { A: 0, B: 0, C: 0, D: 0 };
+  renderQuestion();
+  showScreen('screen-questions');
+}
+
+// ════════ ВОПРОС ════════
+function renderQuestion() {
+  const q   = questions[currentQ];
+  const num = currentQ + 1;
+  const total = questions.length;
+
+  document.getElementById('progress-count').textContent = `${num} из ${total}`;
+  document.getElementById('progress-fill').style.width  = `${(num / total) * 100}%`;
+  document.getElementById('question-text').textContent  = q.text;
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt.text;
+    div.setAttribute('role', 'button');
+    div.setAttribute('tabindex', '0');
+    div.addEventListener('click', () => selectOption(div, opt.type, list));
+    div.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') selectOption(div, opt.type, list);
+    });
+    list.appendChild(div);
+  });
+}
+
+function selectOption(el, type, list) {
+  list.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  lastAnswer = type;
+
+  setTimeout(() => {
+    scores[type]++;
+    currentQ++;
+    if (currentQ < questions.length) {
+      renderQuestion();
+    } else {
+      showScreen('screen-contact');
+    }
+  }, 420);
+}
+
+// ════════ КОНТАКТЫ ════════
+function submitContact() {
+  const name = document.getElementById('inp-name').value.trim();
+  const tg   = document.getElementById('inp-tg').value.trim();
+  const err  = document.getElementById('contact-error');
+
+  if (!name || !tg) {
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+
+  // Определяем тип результата
+  resultType = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  // При ничьей — приоритет последнего ответа
+  const maxScore = Math.max(...Object.values(scores));
+  const topTypes = Object.entries(scores).filter(([,v]) => v === maxScore).map(([k]) => k);
+  if (topTypes.length > 1 && lastAnswer && topTypes.includes(lastAnswer)) {
+    resultType = lastAnswer;
+  }
+
+  renderResult(name);
+  showScreen('screen-result');
+
+  // Отправка данных (замени на свой эндпоинт или бот-вебхук)
+  try {
+    fetch('https://httpbin.org/post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, tg, result: resultType, scores })
+    }).catch(() => {});
+  } catch(e) {}
+}
+
+// ════════ РЕЗУЛЬТАТ ════════
+function renderResult(name) {
+  const r = results[resultType];
+  document.getElementById('result-type').textContent  = r.type;
+  document.getElementById('result-title').textContent = r.title;
+  document.getElementById('result-body').innerHTML    = r.body;
+}
+
+// ════════ REDUCED MOTION ════════
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.style.animationDuration = '0.01ms';
+  });
+}
+</script>
+</body>
+</html>
